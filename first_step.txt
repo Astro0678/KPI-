@@ -1,1 +1,34 @@
-1.adım
+class Agent:
+    def __init__(self, name, shift, chat_amount,good_rating):
+        self.name=name
+        self.shift=shift
+        self.chat_amount= chat_amount
+        self.good_rating= good_rating
+
+#Sample Data
+
+Agent1=Agent("zeki","P",1019,356)
+Agent2=Agent("mert","P",968,303)
+Agent3=Agent("gamze","P",634,229)
+Agent4=Agent("mehmet","P",704,226)
+Agent5=Agent("alper","P",751,223)
+Agent6=Agent("ulas","w",985,238)
+Agent7=Agent("semih","w",682,240)
+Agent8=Agent("ercan","w",513,173)
+Agent9=Agent("aysel","w",845,325)
+Agent10=Agent("ali","m",639,191)
+Agent11=Agent("adem","m",688,196)
+Agent12=Agent("idil","m",749,261)
+Agent13=Agent("alican","m",1058,295)
+Agent14=Agent("dogu","m",695,235)
+Agent15=Agent("ibrahim","m",730,325)
+
+agent_list=[Agent1,Agent2,Agent3,Agent4,Agent5,Agent6,Agent7,Agent8,Agent9,Agent10,Agent11,Agent12,Agent13,Agent14,Agent15]
+
+import pandas as pd
+
+df = pd.DataFrame([vars(agent) for agent in agent_list])
+df["survey_rate"]=((df["good_rating"]/df["chat_amount"])*100).round(2)
+df["averageofgoodrating"]=df["good_rating"].mean()
+df["chatdifference"]=(df["chat_amount"]-df["AverageChatAmount"]).clip(lower=0)
+df["kudos1"]=((df["ratings_over_average"]*0.1)+(df["ratings_over_average"]*0.1)*(df["survey_rate"]/100)).round(2)
