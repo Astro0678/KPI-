@@ -32,3 +32,8 @@ df["survey_rate"]=((df["good_rating"]/df["chat_amount"])*100).round(2)
 df["averageofgoodrating"]=df["good_rating"].mean()
 df["chatdifference"]=(df["chat_amount"]-df["AverageChatAmount"]).clip(lower=0)
 df["kudos1"]=((df["ratings_over_average"]*0.1)+(df["ratings_over_average"]*0.1)*(df["survey_rate"]/100)).round(2)
+df["kudos2"]=((df["chatdifference"]*0.05)+((df["chatdifference"]*0.005)*(df["survey_rate"]/100))/2).round(2)
+
+
+
+
