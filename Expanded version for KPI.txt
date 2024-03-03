@@ -1,0 +1,51 @@
+class Agent:
+    def __init__(self, name, shift, chat_amount,good_rating,CSAT,RR,QA):
+        self.name=name
+        self.shift=shift
+        self.chat_amount= chat_amount
+        self.good_rating= good_rating
+        self.CSAT=CSAT
+        self.RR=RR
+        self.QA=QA
+
+#Sample DATASET
+
+Agent1=Agent("zeki","P",1019,356,0.95,0.96,100)
+Agent2=Agent("mert","P",968,303,0.94,0.99,85)
+Agent3=Agent("gamze","P",634,229,0.99,0.97,94)
+Agent4=Agent("mehmet","P",704,226,0.98,0.93,93)
+Agent5=Agent("alper","P",751,223,0.99,0.97,96)
+Agent6=Agent("ulas","w",985,238,0.92,0.95,97)
+Agent7=Agent("semih","w",682,240,0.94,0.98,98)
+Agent8=Agent("ercan","w",513,173,0.95,0.99,99)
+Agent9=Agent("aysel","w",845,325,0.96,0.97,92)
+Agent10=Agent("ali","m",639,191,0.98,0.98,99)
+Agent11=Agent("adem","m",688,196,0.94,0.98,100)
+Agent12=Agent("idil","m",749,261,0.97,0.98,95)
+Agent13=Agent("alican","m",1058,295,0.92,0.95,100)
+Agent14=Agent("dogu","m",695,235,0.98,0.92,100)
+Agent15=Agent("ibrahim","m",730,325,0.98,0.96,99)
+
+
+
+agent_list=[Agent1,Agent2,Agent3,Agent4,Agent5,Agent6,Agent7,Agent8,Agent9,Agent10,Agent11,Agent12,Agent13,Agent14,Agent15]
+#Creating a list for agents
+
+import pandas as pd
+df = pd.DataFrame([vars(agent) for agent in agent_list])  # Visualization via Panda lib.
+
+df["survey_rate"]=((df["good_rating"]/df["chat_amount"])*100).round(2) #Displaying survey rate in 2 decimal
+df["averageofgoodrating"]=df["good_rating"].mean() # Average of good ratings
+df["ratings_over_average"]=((df["good_rating"]-df["averageofgoodrating"])).clip(lower=0) # Received rates over team average, agents received below team average converted into 0
+selected_shifts_df = df[df['shift'].isin(['m', 'w', 'P'])]
+average_chat_amount = selected_shifts_df.groupby('shift')['chat_amount'].mean()
+df['AverageChatAmount'] = df['shift'].map(average_chat_amount).round(0) # Chat averages were counted according to shifts.
+df["chatdifference"]=(df["chat_amount"]-df["AverageChatAmount"]).clip(lower=0) # Those who received below average counted as 0
+df["kudos1"]=((df["ratings_over_average"]*0.1)+(df["ratings_over_average"]*0.1)*(df["survey_rate"]/100)).round(2) # Kudos points calculated according to shift where agents got higher rate from team average.
+df["kudos2"]=((df["chatdifference"]*0.05)+((df["chatdifference"]*0.005)*(df["survey_rate"]/100))/2).round(2)
+df["survey_average"]=df["survey_rate"].mean()
+df["surveydiff"]=(df["survey_rate"]-df["survey_average"]).clip(lower=0)
+df["csat"] = df["CSAT"].apply(lambda x:(x * 0.20)*100 + (x - 0.96) * 100 if x > 0.96 else (x * 0.20)*100 -(0.96-x)*100) # Agent got extra point for each received stats over target and deduction for each below stats.
+df["qa"] = df["QA"].apply(lambda x:x * 0.20 + (x - 93)  if x > 93 else x * 0.20-(93-x))
+df["rr"] = df["RR"].apply(lambda x:(x * 0.20)*100 + (x - 0.98) * 100 if x > 0.98 else (x * 0.20)*100-(0.98-x)*100)
+df["KPI"]=df["rr"]+df["qa"]+df["csat"]+df["kudos1"]+df["kudos2"] ## Workers who got more chats and more rates got higher point in raking, project aims those who gets more chats and more rate be in higher position in raking.
